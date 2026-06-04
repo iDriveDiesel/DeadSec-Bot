@@ -9,5 +9,7 @@ export const modWatcherConfig = {
     webhookUrl: "https://discord.com/api/webhooks/1511967617810825216/VSZ-xM90oFoFNVoe9WnHMbg55dzCE_KEl1MqcwMHxXkOKf9TKkKJlnIyrdBKT18zYa0R",
 
     // Where to store last-known timestamps
-    storageFile: "./data/modTimestamps.json"
+    storageFile: "./data/modTimestamps.json",
+
+    rolePing: "1468899461077143587"
 };
