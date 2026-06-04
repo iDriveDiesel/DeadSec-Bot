@@ -57,8 +57,20 @@ async function fetchModDetails(modIds) {
 }
 
 async function sendWebhook(mod) {
+    let content = null;
+
+    // Handle single or multiple role pings
+    if (modWatcherConfig.rolePing) {
+        if (Array.isArray(modWatcherConfig.rolePing)) {
+            content = modWatcherConfig.rolePing.map(id => `<@&${id}>`).join(" ");
+        } else {
+            content = `<@&${modWatcherConfig.rolePing}>`;
+        }
+    }
+
     await axios.post(modWatcherConfig.webhookUrl, {
         username: "DeadSec Mod Watcher",
+        content: content, // role ping goes here
         embeds: [
             {
                 title: `🔧 Mod Updated: ${mod.title}`,
