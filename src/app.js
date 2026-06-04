@@ -1,3 +1,4 @@
+import { startModWatcher } from "./services/modWatcher.js";
 ﻿import 'dotenv/config';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { REST } from '@discordjs/rest';
@@ -87,6 +88,9 @@ class TitanBot extends Client {
       startupLog('Registering slash commands...');
       await this.registerCommands();
       startupLog('Slash commands registration complete');
+
+      // Start Steam Workshop Mod Watcher
+      startModWatcher();
       
       const databaseMode = dbStatus.isDegraded
         ? 'Optional in-memory mode (data resets after restart)'
@@ -381,6 +385,3 @@ try {
 }
 
 export default TitanBot;
-
-
-
