@@ -3,13 +3,8 @@ import { forceCheckMods } from "../../services/modWatcher.js";
 
 export default {
     data: new SlashCommandBuilder()
-        .setName("modwatch")
-        .setDescription("Mod watcher commands")
-        .addSubcommand(sub =>
-            sub
-                .setName("forcecheck")
-                .setDescription("Force the mod watcher to run immediately")
-        ),
+        .setName("modwatch-forcecheck")
+        .setDescription("Force the mod watcher to run immediately"),
 
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
@@ -22,7 +17,7 @@ export default {
 
         if (result.updated) {
             return interaction.editReply(
-                `✅ Force-check complete. Updated mods:\n- ${result.updates.join("\n- ")}`
+                `✅ Force-check complete.\nUpdated mods:\n- ${result.updates.join("\n- ")}`
             );
         }
 
