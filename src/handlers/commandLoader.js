@@ -83,6 +83,11 @@ export async function loadCommands(client) {
             
             const commandModule = await import(`file://${filePath}`);
             const command = commandModule.default || commandModule;
+            const primaryCommandName = command.data?.name;
+
+            if (primaryCommandName === "modwatch") {
+                logger.info(`>>> DEBUG: saw modwatch command at ${filePath}`);
+            }
             
             if (!command.data || !command.execute) {
                 logger.warn(`Command at ${filePath} is missing required "data" or "execute" property.`);
@@ -91,8 +96,6 @@ export async function loadCommands(client) {
             
             command.category = category;
             command.filePath = normalizedPath;
-            
-            const primaryCommandName = command.data.name;
             
             if (!uniqueCommandNames.has(primaryCommandName)) {
                 uniqueCommandNames.add(primaryCommandName);
@@ -325,5 +328,3 @@ export async function reloadCommand(client, commandName) {
         return { success: false, message: `Error reloading command: ${error.message}` };
     }
 }
-
-
