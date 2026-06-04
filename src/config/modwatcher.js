@@ -9,7 +9,7 @@ export const modWatcherConfig = {
     ],
 
     // Your Discord webhook URL (we'll set this in a moment)
-    webhookUrl: "YOUR_WEBHOOK_URL_HERE",
+    webhookUrl: "https://discord.com/api/webhooks/1511967617810825216/VSZ-xM90oFoFNVoe9WnHMbg55dzCE_KEl1MqcwMHxXkOKf9TKkKJlnIyrdBKT18zYa0R",
 
     // Where to store last-known timestamps
     storageFile: "./data/modTimestamps.json"
