@@ -25,6 +25,25 @@ function saveTimestamps() {
     }
 }
 
+// 🔥 Fetch all mod IDs from a Workshop collection
+async function fetchCollectionModIds(collectionId) {
+    const url = `https://steamcommunity.com/sharedfiles/filedetails/?id=${collectionId}`;
+    const res = await axios.get(url);
+
+    const html = res.data;
+
+    // Extract all mod IDs from the collection page
+    const regex = /sharedfiles\/filedetails\/\?id=(\d+)/g;
+    const ids = new Set();
+    let match;
+
+    while ((match = regex.exec(html)) !== null) {
+        ids.add(match[1]);
+    }
+
+    return [...ids];
+}
+
 async function fetchModDetails(modIds) {
     const form = new URLSearchParams();
     form.append("itemcount", modIds.length);
@@ -55,36 +74,45 @@ async function sendWebhook(mod) {
     });
 }
 
-async function checkMods() {
-    try {
-        const mods = await fetchModDetails(modWatcherConfig.modIds);
-
-        for (const mod of mods) {
-            const id = mod.publishedfileid;
-            const updated = mod.time_updated;
-
-            if (!timestamps[id]) {
-                timestamps[id] = updated;
-                continue;
-            }
-
-            if (updated > timestamps[id]) {
-                logger.info(`Mod updated: ${mod.title}`);
-                await sendWebhook(mod);
-                timestamps[id] = updated;
-            }
-        }
-
-        saveTimestamps();
-    } catch (err) {
-        logger.error("Mod watcher error:", err);
-    }
-}
-
-export function startModWatcher() {
+export async function startModWatcher() {
     loadTimestamps();
     logger.info("Mod watcher started.");
 
-    checkMods(); // run immediately
-    setInterval(checkMods, modWatcherConfig.pollIntervalMinutes * 60 * 1000);
+    async function run() {
+        try {
+            // Get all mod IDs from the collection
+            const modIds = await fetchCollectionModIds(modWatcherConfig.collectionId);
+
+            if (!modIds.length) {
+                logger.warn("No mods found in the collection.");
+                return;
+            }
+
+            const mods = await fetchModDetails(modIds);
+
+            for (const mod of mods) {
+                const id = mod.publishedfileid;
+                const updated = mod.time_updated;
+
+                if (!timestamps[id]) {
+                    timestamps[id] = updated;
+                    continue;
+                }
+
+                if (updated > timestamps[id]) {
+                    logger.info(`Mod updated: ${mod.title}`);
+                    await sendWebhook(mod);
+                    timestamps[id] = updated;
+                }
+            }
+
+            saveTimestamps();
+        } catch (err) {
+            logger.error("Mod watcher error:", err);
+        }
+    }
+
+    // Run immediately, then on interval
+    run();
+    setInterval(run, modWatcherConfig.pollIntervalMinutes * 60 * 1000);
 }
